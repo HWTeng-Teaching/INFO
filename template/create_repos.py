@@ -35,13 +35,12 @@ import requests
 # ----------------------------  CONFIG  ----------------------------
 CSV_PATH          = "mlfintech_roster.csv"
 
-OWNER             = "HWTeng-Teaching"  # org name, OR your own GitHub username
+OWNER             = "202609-ML-FinTech"     # org name, OR your own GitHub username
 OWNER_TYPE        = "org"                   # "org"  or  "user"
 
-# Repo name = f"{REPO_PREFIX}{SEP}{key}" where key comes from KEY_FIELD.
-REPO_PREFIX       = "202609-ML-FinTech"
-SEP               = "-"
-KEY_FIELD         = "github"                # "github" (recommended, unique) or "student_id"
+# Repo name = "<student_id>-<nickname>" (sanitized for GitHub), e.g. "113700058-Ella".
+# Since OWNER already encodes the course/term, no extra prefix is added — the repo
+# ends up at github.com/202609-ML-FinTech/<student_id>-<nickname>.
 
 VISIBILITY        = "private"              # "private" or "public"
 INIT_README       = True                   # create an initial commit with a README
@@ -49,7 +48,7 @@ INIT_README       = True                   # create an initial commit with a REA
 ADD_COLLABORATOR  = True                    # invite the student to their repo
 COLLAB_PERMISSION = "push"                  # pull / triage / push / maintain / admin
 
-DRY_RUN           = True                    # keep True until you've reviewed the plan
+DRY_RUN           = False                    # keep True until you've reviewed the plan
 RESULTS_CSV       = "repo_results.csv"
 SLEEP_BETWEEN     = 0.5                     # seconds between API calls (be gentle)
 # ------------------------------------------------------------------
@@ -108,7 +107,7 @@ def create_repo(repo: str) -> tuple[bool, str]:
         "name": repo,
         "private": VISIBILITY == "private",
         "auto_init": INIT_README,
-        "description": f"{REPO_PREFIX} personal repo",
+        "description": f"{OWNER} — student repo",
     }
     if OWNER_TYPE == "org":
         url = f"{API}/orgs/{OWNER}/repos"
@@ -147,8 +146,14 @@ def main():
     results = []
     for i, row in enumerate(rows, 1):
         gh = row["github"].strip()
-        key = row.get(KEY_FIELD, gh).strip() or gh
-        repo = sanitize_repo_name(f"{REPO_PREFIX}{SEP}{key}")
+        student_id = row.get("student_id", "").strip()
+        nickname = row.get("nickname", "").strip() or row.get("name", "").strip()
+        if student_id and nickname:
+            key = f"{student_id}-{nickname}"
+        else:
+            # Fallback if a row is missing student_id/nickname — keeps the repo unique.
+            key = student_id or nickname or gh
+        repo = sanitize_repo_name(key)
         label = f"{row.get('name','') or row.get('nickname','')} ({gh})"
         status = {"name": row.get("name", ""), "nickname": row.get("nickname", ""),
                   "github": gh, "repo": repo, "user_ok": "", "repo": repo,
