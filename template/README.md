@@ -1,18 +1,8 @@
-# Student Repo Setup — 202609-ML-FinTech
+# Student Repo Setup
 
 Automated setup that turns a class roster into one private GitHub repo per student, with the student added as a collaborator. Runs entirely from the command line — no manual repo creation.
 
 ## How it works
-
-```mermaid
-flowchart LR
-    A[Google Form<br/>students fill in] --> B[Google Sheet<br/>roster]
-    B -->|export CSV| C[mlfintech_roster.csv]
-    C --> D[create_repos.py]
-    D -->|GitHub API| E[202609-ML-FinTech org]
-    E --> F["One private repo per student<br/>(name: student_id-nickname)"]
-    E --> G[Student added as collaborator]
-```
 
 1. Students fill in a Google Form (name, student ID, course, GitHub username, email).
 2. Responses land in a Google Sheet. Export it as CSV → `mlfintech_roster.csv`.
@@ -31,11 +21,17 @@ flowchart LR
 
 ## Prerequisites
 
-- Python 3.8+ and the `requests` library: `pip install requests`
+- Install Python 3.8+ and the `requests` library in the terminal: `pip install requests`
 - A **GitHub classic Personal Access Token** with the **`repo`** scope only (Fine-grained tokens need extra org-level setup — classic is simpler for this).
   Create one at `github.com/settings/tokens` → **Generate new token (classic)**.
+  <img width="1101" height="339" alt="截圖 2026-09-08 下午1 51 39" src="https://github.com/user-attachments/assets/699a69bb-8085-4ba2-8be0-bb722c398815" />
+  <img width="1169" height="615" alt="截圖 2026-09-08 下午1 53 18" src="https://github.com/user-attachments/assets/bf7d58ab-2023-4747-ab76-7c2aba6dc448" />
+  Choose repo scope; the others remain default. → Generate token
+
+
+
 - The GitHub account behind that token must be an **Owner** (or have repo-creation rights) on the `202609-ML-FinTech` organization.
-  Check at `github.com/orgs/202609-ML-FinTech/people`.
+  Check at `github.com/orgs/Organiztion-name/people`.
 
 ## Running it
 
